@@ -1,13 +1,38 @@
-from flask import Flask
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def hello():
     return "Hello, Flask!"
+
+
+@app.route('/analyze-images', methods=['POST'])
+def analyze_images_route():
+    files = get_uploaded_images(request)
+    return ""
+    
+   
+def get_uploaded_images(req, max_count=3):
+    file_keys = req.files.keys()
+    print("📂 업로드된 파일 키 목록:", list(file_keys))
+
+    files = []
+    for i in range(1, max_count + 1):
+        file = req.files.get(f'image{i}')
+        if file:
+            print(f"✅ image{i} 업로드됨 - filename: {file.filename}, content_type: {file.content_type}")
+            files.append(file)
+        else:
+            print(f" image{i} 없음")
+    return files
+
+
 
 @app.route('/openai')  
 def openai():
@@ -61,4 +86,4 @@ def openai():
     return "This is the about page."
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
