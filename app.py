@@ -10,7 +10,7 @@ def hello():
     return "Hello, Flask!"
 
 @app.route('/openai')  
-def about():
+def openai():
 
     load_dotenv()
     api_key = os.getenv("OPENAI_API_KEY")  # 환경 변수에서 키 읽기
