@@ -1,14 +1,13 @@
-import os
+
 import pathlib
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, url_for
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app)
-
 # ------- 설정 -------
-BASE_DIR = pathlib.Path(__file__).resolve().parent
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent  # src의 상위 = 프로젝트 루트
 UPLOAD_DIR = BASE_DIR / "static" / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 

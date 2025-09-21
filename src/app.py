@@ -1,25 +1,36 @@
-from openai import OpenAI
-
-from flask import Flask, request
-from flask_cors import CORS
+from flask import request
 from openai_test import run_images
-
+from flask import jsonify
+from werkzeug.exceptions import HTTPException
 from image_utils import *
+from run_image_service import *
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/')
 def hello():
+
     return "Hello, Flask!"
 
 
 @app.route('/analyze-images', methods=['POST'])
 def analyze_images_route():
-    files = get_uploaded_images(request)
-    return ""
+    """
+    JSON:
+    - {"url": "/static/uploads/a.png"}
+    - {"urls": ["/static/uploads/a.png", "/static/uploads/b.jpg"]}
+    """
+    urls = extract_image_urls(request)
+    if not urls:
+        raise ValueError("이미지 URL이 필요합니다. (url 또는 urls)")
 
+    # files = load_local_files(urls)
+    # if not files:
+    #     raise ValueError("파일을 찾을 수 없습니다.")
 
+    result = run_images(urls)
+    return result
 # ------- 이미지 업로드 -------
 
 @app.route("/upload-image", methods=["POST"])
@@ -40,20 +51,14 @@ def upload_image():
         return jsonify({"error": str(e)}), 400
 
 
-def get_uploaded_images(req, max_count=3):
-    file_keys = req.files.keys()
-    print("📂 업로드된 파일 키 목록:", list(file_keys))
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # HTTPException (Flask/werkzeug 기본 예외: 404, 400 등)
+    if isinstance(e, HTTPException):
+        return jsonify({"error": e.description}), e.code
 
-    files = []
-    for i in range(1, max_count + 1):
-        file = req.files.get(f'image{i}')
-        if file:
-            print(f"✅ image{i} 업로드됨 - filename: {file.filename}, content_type: {file.content_type}")
-            files.append(file)
-        else:
-            print(f" image{i} 없음")
-    return files
-
+    # 나머지 일반 Exception → 500
+    return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

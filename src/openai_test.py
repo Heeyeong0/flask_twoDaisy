@@ -1,4 +1,5 @@
 import os, base64, mimetypes, json, re
+from pathlib import Path
 from typing import List, Dict, Any, Tuple
 from collections import Counter, defaultdict
 from openai import OpenAI
@@ -8,6 +9,7 @@ from pillow_heif import register_heif_opener
 from dotenv import load_dotenv
 import os
 
+from src.image_utils import UPLOAD_DIR
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
@@ -71,9 +73,9 @@ MERGE_HINT = (
 # ===========================
 register_heif_opener()  # HEIC 지원
 
-def require_file(path: str):
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"파일 없음: {path}")
+BASE_DIR   = Path(__file__).resolve().parent.parent  # 프로젝트 루트
+STATIC_DIR = BASE_DIR / "static"
+
 
 def ensure_supported_format(image_path: str) -> str:
     """
@@ -99,11 +101,15 @@ def ensure_supported_format(image_path: str) -> str:
         im.save(new_path, "JPEG")
     return new_path
 
-def to_data_uri(image_path: str) -> str:
-    safe = ensure_supported_format(image_path)
-    mime, _ = mimetypes.guess_type(safe.lower())
+
+def to_data_uri(image_path) -> str:
+    p = Path(image_path).resolve()  # Path로 통일
+    safe = ensure_supported_format(str(p))  # ensure_supported_format이 str 기대할 수 있으니 str 변환
+
+    mime, _ = mimetypes.guess_type(safe.lower())  # safe는 str이라 lower() 가능
     if mime is None:
         mime = "image/jpeg"
+
     with open(safe, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("utf-8")
     return f"data:{mime};base64,{b64}"
@@ -251,15 +257,19 @@ Output:
 # ===========================
 # 메인 파이프라인
 # ===========================
-def run_images(images):
-    if not CONTENT_IMAGES:
-        raise ValueError("CONTENT_IMAGES에 최소 1개 이상의 이미지 경로를 넣어주세요.")
-    for p in CONTENT_IMAGES:
-        require_file(p)
+def run_images(urls):
+    local_paths = []
+
+    if not urls:
+        raise ValueError("최소 1개 이상의 이미지 경로를 넣어주세요.")
+    for p in urls:
+        print(p)
+        path = UPLOAD_DIR / p
+        local_paths.append(path)
 
     # 1) 이미지마다 풍부한 캡션
     print("[1/5] Generating rich captions…")
-    captions = [chat_vision_image_caption(client, p) for p in CONTENT_IMAGES]
+    captions = [chat_vision_image_caption(client, p) for p in local_paths]
 
     # 2) 각 캡션에서 MUST JSON(대표1 + MUST6) 추출
     print("[2/5] Extracting per-image MUST JSON…")
