@@ -2,6 +2,8 @@ import os, base64, mimetypes, json, re
 from pathlib import Path
 from typing import List, Dict, Any, Tuple
 from collections import Counter, defaultdict
+
+from flask import jsonify
 from openai import OpenAI
 from PIL import Image
 from pillow_heif import register_heif_opener
@@ -34,7 +36,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent  # src 상위 = 프로젝트 �
 OUTPUT_DIR = BASE_DIR / "static" / "outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-OUTPUT_IMAGE = OUTPUT_DIR / f"{uuid.uuid4().hex}.png"
+output_filename = f"{uuid.uuid4().hex}.png"
+OUTPUT_IMAGE = OUTPUT_DIR / output_filename
 
 # 세로: "1024x1536" / 가로: "1536x1024" / 정사각: "1024x1024" / "auto"
 SIZE           = "1024x1536"
@@ -305,4 +308,8 @@ def run_images(urls):
 
     print(f"\n✅ Done! Saved -> {OUTPUT_IMAGE}")
 
-    return str(OUTPUT_IMAGE)
+    return jsonify({
+        "result_image_path": OUTPUT_IMAGE,  # 키를 붙여 JSON으로
+        "result_image_name": output_filename  # 키를 붙여 JSON으로
+
+    })

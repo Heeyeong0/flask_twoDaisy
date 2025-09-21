@@ -21,7 +21,7 @@ def analyze_images_route():
     - {"url": "/static/uploads/a.png"}
     - {"urls": ["/static/uploads/a.png", "/static/uploads/b.jpg"]}
     """
-    urls = extract_image_urls(request)
+    urls = extract_image_filenames(request)
     if not urls:
         raise ValueError("이미지 URL이 필요합니다. (url 또는 urls)")
 
