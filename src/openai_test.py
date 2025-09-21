@@ -11,6 +11,10 @@ import os
 
 from src.image_utils import UPLOAD_DIR
 
+import uuid
+from pathlib import Path
+
+
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 organization = os.getenv("OPENAI_ORGANIZATION")
@@ -26,8 +30,11 @@ client = OpenAI( api_key = api_key, organization = organization )
 CONTENT_IMAGES: List[str] = ["img007.jpeg", "img008.jpeg"]  # 1~N장 아무거나
 
 
+BASE_DIR = Path(__file__).resolve().parent.parent  # src 상위 = 프로젝트 루트
+OUTPUT_DIR = BASE_DIR / "static" / "outputs"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-OUTPUT_IMAGE   = "final_hybrid_required.png"
+OUTPUT_IMAGE = OUTPUT_DIR / f"{uuid.uuid4().hex}.png"
 
 # 세로: "1024x1536" / 가로: "1536x1024" / 정사각: "1024x1024" / "auto"
 SIZE           = "1024x1536"
@@ -298,4 +305,4 @@ def run_images(urls):
 
     print(f"\n✅ Done! Saved -> {OUTPUT_IMAGE}")
 
-    return OUTPUT_IMAGE
+    return str(OUTPUT_IMAGE)

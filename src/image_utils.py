@@ -3,6 +3,11 @@ import pathlib
 from flask import Flask, url_for
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+import uuid
+from pathlib import Path
+from werkzeug.utils import secure_filename
+from flask import url_for
+
 
 app = Flask(__name__)
 CORS(app)
@@ -31,24 +36,19 @@ def unique_path(upload_dir: pathlib.Path, filename: str) -> pathlib.Path:
         counter += 1
     return target
 
-def save_file_and_get_url(file_storage) -> str:
-    """FileStorage 1개 저장 후 외부 접근 URL 반환"""
+def save_file_and_get_name(file_storage) -> str:
+    """FileStorage 1개 저장 후 난수화된 파일명 반환"""
     if not file_storage or file_storage.filename == "":
         raise ValueError("파일이 비어있습니다.")
     if not is_allowed(file_storage.filename):
         raise ValueError(f"허용되지 않는 확장자: {file_storage.filename}")
-    target = unique_path(UPLOAD_DIR, file_storage.filename)
-    file_storage.save(target)
-    # Flask 기본 static 라우트 활용
-    rel = target.relative_to(BASE_DIR / "static")
-    return url_for("static", filename=str(rel).replace("\\", "/"), _external=True)
 
-def save_files_and_get_urls(files) -> list:
-    urls = []
-    for f in files:
-        try:
-            urls.append(save_file_and_get_url(f))
-        except Exception as e:
-            # 일부 실패해도 나머지 진행: 필요 시 정책에 맞게 전체 실패 처리로 바꿔도 됨
-            print(f"❌ 업로드 실패: {getattr(f, 'filename', '')} - {e}")
-    return urls
+    # 확장자 추출
+    ext = Path(secure_filename(file_storage.filename)).suffix.lower()
+    new_name = f"{uuid.uuid4().hex}{ext}"
+
+    target = UPLOAD_DIR / new_name
+    file_storage.save(target)
+
+    # URL 대신 파일 이름만 반환
+    return new_name

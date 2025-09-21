@@ -25,10 +25,6 @@ def analyze_images_route():
     if not urls:
         raise ValueError("이미지 URL이 필요합니다. (url 또는 urls)")
 
-    # files = load_local_files(urls)
-    # if not files:
-    #     raise ValueError("파일을 찾을 수 없습니다.")
-
     result = run_images(urls)
     return result
 # ------- 이미지 업로드 -------
@@ -45,8 +41,8 @@ def upload_image():
         return jsonify({"error": "image 필드로 파일을 전송하세요."}), 400
 
     try:
-        url = save_file_and_get_url(file)  # 앞서 만든 공통 유틸 사용
-        return jsonify({"url": url})
+        file_name = save_file_and_get_name(file)  # 앞서 만든 공통 유틸 사용
+        return jsonify({"name": file_name})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
