@@ -4,6 +4,9 @@ from flask import jsonify
 from werkzeug.exceptions import HTTPException
 from image_utils import *
 from run_image_service import *
+from flask import send_from_directory, abort
+from src.openai_test import OUTPUT_DIR
+
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +48,25 @@ def upload_image():
         return jsonify({"name": file_name})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+
+@app.route("/get-image/<filename>", methods=["GET"])
+def get_image(filename):
+    """
+    저장된 이미지 1장을 반환
+    URL: /get-image/<파일명>
+    예: /get-image/abc123.png
+    """
+    try:
+        return send_from_directory(
+            OUTPUT_DIR,       # static/uploads 경로 (Path → str 변환 필요할 수 있음)
+            filename,
+            as_attachment=False  # True면 다운로드, False면 브라우저에서 직접 보여줌
+        )
+    except FileNotFoundError:
+        abort(404, description=f"이미지 없음: {filename}")
+
 
 
 @app.errorhandler(Exception)

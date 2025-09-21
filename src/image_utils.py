@@ -6,7 +6,6 @@ from werkzeug.utils import secure_filename
 import uuid
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from flask import url_for
 
 
 app = Flask(__name__)
