@@ -1,1 +1,21 @@
 .env
+static/uploads/
+
+# Python 캐시/빌드 파일
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+
+# 가상환경
+venv/
+.env
+
+# 업로드된 이미지 (임시 저장용)
+static/uploads/
+
+# IDE/에디터 설정
+.vscode/
+.idea/
