@@ -15,6 +15,7 @@ venv/
 
 # 업로드된 이미지 (임시 저장용)
 static/uploads/
+static/outputs/
 
 # IDE/에디터 설정
 .vscode/
