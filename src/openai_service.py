@@ -309,7 +309,6 @@ def run_images(urls):
     print(f"\n✅ Done! Saved -> {OUTPUT_IMAGE}")
 
     return jsonify({
-        "result_image_path": OUTPUT_IMAGE,  # 키를 붙여 JSON으로
         "result_image_name": output_filename  # 키를 붙여 JSON으로
 
     })
