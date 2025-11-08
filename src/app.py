@@ -1,22 +1,30 @@
 from flask import request
-from openai_test import run_images
+from openai_service import run_images
 from flask import jsonify
 from werkzeug.exceptions import HTTPException
 from image_utils import *
 from run_image_service import *
 from flask import send_from_directory, abort
-from src.openai_test import OUTPUT_DIR
+from src.openai_service import OUTPUT_DIR
+
+
+
+#
+# from db.session import Base, engine
+# from models.image_record import ImageRecord
 
 
 app = Flask(__name__)
 CORS(app)
+
+# Base.metadata.create_all(engine)
 
 @app.route('/')
 def hello():
 
     return "Hello, Flask!"
 
-
+#todo : 이미지 돌린 뒤 서버 저장
 @app.route('/analyze-images', methods=['POST'])
 def analyze_images_route():
     """
@@ -31,7 +39,6 @@ def analyze_images_route():
     result = run_images(urls)
     return result
 # ------- 이미지 업로드 -------
-
 @app.route("/upload-image", methods=["POST"])
 def upload_image():
     """

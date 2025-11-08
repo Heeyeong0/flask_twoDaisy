@@ -5,7 +5,7 @@ def extract_image_filenames(req, max_count=3):
     예: {"files": ["a.jpg", "b.png"]}
     """
     data = req.get_json(silent=True) or {}
-    files = data.get("files", [])
+    files = data.get("urls", [])
     if not isinstance(files, list):
         raise ValueError("files 필드는 리스트여야 합니다.")
     return files[:max_count]
