@@ -8,7 +8,7 @@ from sqlalchemy import func, and_
 
 from src.db.session import SessionLocal, Base, engine
 from src.models.image_record import ImageRecord
-from src.openai_service import OUTPUT_DIR
+from src.openai_service import OUTPUT_DIR, run_images
 
 from image_utils import *
 from run_image_service import *
@@ -175,8 +175,7 @@ def analyze_images_route():
     if not urls:
         raise ValueError("이미지 URL이 필요합니다. (url 또는 urls)")
 
-    # result = run_images(urls)
-    result = "fortestimagename"
+    result = run_images(urls)
 
     image_name = result
 
