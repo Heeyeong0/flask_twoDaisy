@@ -7,6 +7,8 @@ from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from pathlib import Path
 
+from src.image_utils import UPLOAD_DIR
+
 # ===========================
 # 설정
 # ===========================
@@ -233,4 +235,8 @@ async def ultra_optimized_main(local_paths):
     elapsed = time.time() - start_time
     print(f"\n✅ 완료! 총 소요시간: {elapsed:.1f}초")
     print(f"📸 생성된 이미지: {OUTPUT_IMAGE}")
-    return OUTPUT_IMAGE
+
+    filename = os.path.basename(OUTPUT_IMAGE)
+    print(filename)
+
+    return filename
