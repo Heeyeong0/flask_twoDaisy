@@ -167,29 +167,41 @@ def delete_image_by_name():
 @app.route('/analyze-images', methods=['POST'])
 def analyze_images_route():
     """
-    JSON:
-    - {"url": "/static/uploads/a.png"}
-    - {"urls": ["/static/uploads/a.png", "/static/uploads/b.jpg"]}
+    JSON 예시:
+    {
+        "urls": ["a.png", "b.jpg"],
+        "additional_text": "일기 내용"
+    }
     """
+    data = request.get_json(silent=True) or {}
+
+    # 1) 이미지 URL 추출
     urls = extract_image_filenames(request)
     if not urls:
         raise ValueError("이미지 URL이 필요합니다. (url 또는 urls)")
 
+    # 2) 추가 텍스트(optional)
+    additional_text = data.get("additional_text", None)
+
+    # 3) 실제 이미지 처리 함수 호출
     result = run_images(urls)
 
     image_name = result
 
-    # 2) DB 저장
+    # 4) DB 저장
     db = SessionLocal()
-    record = ImageRecord(image_name=image_name)
-    print("image_name" , image_name)
+    record = ImageRecord(
+        image_name=image_name,
+        additional_text=additional_text  # 모델에 필드가 있을 때만 저장
+    )
+
     db.add(record)
     db.commit()
     db.refresh(record)
 
     return jsonify({
-        "result_image_name": result  # 키를 붙여 JSON으로
-
+        "result_image_name": image_name,
+        "additional_text": additional_text
     })
 
 
