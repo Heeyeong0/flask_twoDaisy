@@ -182,12 +182,15 @@ def analyze_images_route():
     # 2) DB 저장
     db = SessionLocal()
     record = ImageRecord(image_name=image_name)
+    print("image_name" , image_name)
     db.add(record)
     db.commit()
     db.refresh(record)
 
-    return result
+    return jsonify({
+        "result_image_name": result  # 키를 붙여 JSON으로
 
+    })
 
 
 # ------- 이미지 업로드 -------
