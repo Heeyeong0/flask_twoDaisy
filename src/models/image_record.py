@@ -9,4 +9,6 @@ class ImageRecord(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    image_name = Column(String, nullable=False)
+    image_name = Column(String, nullable=True)
+    #
+    additional_text = Column(String, nullable=True)
